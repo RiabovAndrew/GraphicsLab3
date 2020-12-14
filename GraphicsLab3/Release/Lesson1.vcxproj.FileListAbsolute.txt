@@ -1,0 +1,2 @@
+E:\Github\GraphicsLab2\GraphicsLab2\Release\Lesson1.exe
+P:\C++\GraphicsLab3\GraphicsLab3\Release\Lesson1.exe
