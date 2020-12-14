@@ -1,26 +1,19 @@
-# GraphicsLab2
+# GraphicsLab3
  
-# Отчёт по лабораторной работе 2 по Графике GraphicsLab1<br>студента группы ПА-18-2<br>Рябова Андрея Дмитриевича
+# Отчёт по лабораторной работе 3 по Графике GraphicsLab1<br>студента группы ПА-18-2<br>Рябова Андрея Дмитриевича
 
 ## Завдання
-1. Створіть своє унікальне ім'я двигуна OpenGL - як абревіатуру вашого імені.
-Наприклад GSC - Григорович Сергій Константинович [(GSC Game World)](https://en.wikipedia.org/wiki/GSC_Game_World)
-```
-namespace GSC{
-}
-```
-2. Використовуючи шаблон програми Task02Src [https://github.com/KnightDanila/GraphicProjects_OpenGL_Shaders_GLSL/tree/master/Lesson2/Task02Src] - запишіть та запустіть код з вашим простором імен.
-3. Використовуйте діаграму UML для довідки:
-! [UML] (data / UML_Main1.jpg)
+1. Ознайомитись з можливостями графічної бібліотеки GLM. Розібратися з особливостями підключення бібліотеки GLM.
+2. Використовуючи шаблон програми [Task03Src](https://github.com/KnightDanila/GraphicProjects_OpenGL_Shaders_GLSL/tree/master/Lesson3/Task03Src) - запишіть та запустіть код з вашим простором імен.
+3. Використовуйте діаграму UML для довідки: 
 4. Додайте вихід до консолі:
 ```
-Завдання 2
-Автор: Вася Пупкін
+Task 3 Author: Vasya Pupkin
 ```
-5. Створіть 3 вікна за допомогою класу GLWindow
-6. Намалюйте об'єкт VBO (без текстури)
-7. Намалюйте простий масив точок glDrawArrays()
-8. Покажіть, що ви можете використовувати дві рендерні машини GLRender () та GLRendererOld2_1 ().
+1. Створіть камеру за допомогою класу ...::GraphCore::Camera* CamFree = new ...::GraphCore::GLCameraFree();
+2. Встановити перспективу CamFree->setPerspective(...);
+3. Намалюйте об'єкт VBO (з лабораторії 2)
+4. І перемістіть камеру за допомогою {x = r * cos(df); y = r * sin(df);}
 ## Выполнение:
 **Main.cpp**
 ```
@@ -28,20 +21,28 @@ namespace GSC{
 #include <windows.h>
 #include <cmath>
 #include <numbers>
+#include <cstdio>
 
-
-
-
+//#pragma comment(lib, "libs\\GL_AL\\glfw3.lib")
+//#pragma comment(lib, "libs\\GL_AL\\glut32.lib")
+//#pragma comment(lib, "libs\\GL_AL\\glut32.dll")
+//#pragma comment(lib, "libs\\GL_AL\\alut.lib")
+//#pragma comment(lib, "libs\\GL_AL\\glew32.lib")
+//#pragma comment(lib, "libs\\GL_AL\\glew32s.lib")
+//
+//#pragma comment(lib, "msvcrt.lib")
+//#pragma comment(lib, "msvcmrt.lib")
+//#pragma comment(lib, "legacy_stdio_definitions.lib")
 
 #include "libs\GL_AL\glew.h"
-
-
 
 #include "libs\GL_AL\glfw3.h"
 #include "libs\GL_AL\glm\glm.hpp"
 #include "libs\GL_AL\glm\gtc\matrix_transform.hpp"
 #include "libs\GL_AL\shader.h"
 
+#include "libs\GL_AL\glut.h"
+#include "libs\GL_AL\glm\gtc\type_ptr.hpp"
 
 
 #define GLUT_DISABLE_ATEXIT_HACK
@@ -152,6 +153,8 @@ namespace Cube {
 
 #include "GLRenderSystem.h"
 #include "GLWindow.h";
+#include "GLCamera.h"
+
 using namespace std;
 
 template< typename T >
@@ -215,13 +218,21 @@ int main(int argc, char** argv) {
 
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
+    rory::GraphCore::Camera* CamFree = new rory::GraphCore::GLCameraFree();
+    CamFree->setPerspective(glm::radians(45.0f), (float) 640 / 420, 0.01f, 1000.0f);
+
+
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0) {
+		glfwMakeContextCurrent(window);
+        float angle = glfwGetTime() * 50.0f;
+        CamFree->setPos(glm::vec3(2 * cos(angle * std::numbers::pi / 180), 2, 2 * sin(angle * std::numbers::pi / 180)));
+        CamFree->start();
+		renderer->render(window);
+        CamFree->end();
+		glfwSwapBuffers(window);
 		glfwMakeContextCurrent(win1->get_glfw_handle());
 		renderer->render(win1->get_glfw_handle());
 		glfwSwapBuffers(win1->get_glfw_handle());
-		glfwMakeContextCurrent(win2->get_glfw_handle());
-		renderer->render(win2->get_glfw_handle());
-		glfwSwapBuffers(win2->get_glfw_handle());
 		glfwPollEvents();
 		glfwMakeContextCurrent(window);
 		renderer->render(window);
@@ -390,6 +401,100 @@ namespace rory {
 	};
 }
 #endif GLWINDOW_H 
+```
+**GLCamera.h**
+```
+#ifndef GLCAMERA_H
+#define GLCAMERA_H
+
+#include "libs\GL_AL\glew.h"
+#include "libs\GL_AL\glfw3.h"
+
+#include <cstdio>
+
+namespace rory {
+    namespace GraphCore {
+
+        class Camera {
+        public:
+
+            virtual void setPerspective(float fov, float aspect, float near, float far) {
+
+            };
+
+            virtual void setPos(glm::vec3 pos) {
+            };
+
+            virtual void setTarget(glm::vec3 pos) {
+
+            };
+
+            virtual void start() {
+
+            };
+
+            virtual void end() {
+
+            };
+
+            virtual glm::vec3 getPos() = 0;
+
+
+        protected:
+
+            glm::mat4 _modelproj = glm::mat4(0.0f);
+            glm::vec3 _pos = glm::vec3(0.0f);
+            glm::vec3 _direction = glm::vec3(0.0f);
+            glm::mat4 _modelview = glm::mat4(0.0f);
+        };
+
+        class GLCameraFree : public Camera {
+        public:
+
+            void setPerspective(float fov, float aspect, float near1, float far1) {
+
+
+                glMatrixMode(GL_PROJECTION);
+                _modelproj = glm::perspective(fov, aspect, near1, far1);
+                glLoadMatrixf(glm::value_ptr(_modelproj));
+
+
+            };
+
+            void setPos(glm::vec3 pos) {
+                glm::vec3 target = glm::vec3(0.0f);
+                glm::vec3 direction = glm::normalize(pos - target);
+                _modelview = glm::lookAt(pos, direction, glm::vec3(0, 1, 0));
+
+            }
+
+            void start() {
+                glMatrixMode(GL_MODELVIEW);
+                glPushMatrix();
+                glLoadMatrixf(glm::value_ptr(_modelview));
+            }
+
+            void end() {
+                glPopMatrix();
+            }
+
+            glm::vec3 getPos() {
+                return glm::vec3(0);
+            };
+        };
+
+        class GLCameraTarget : public Camera {
+            
+        };
+
+
+
+    };
+}
+
+#endif /* GLCAMERA_H */
+
+
 ```
 ## Работа программы:
 ![Пример 1](screenshots/screenshot1.png)
