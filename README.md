@@ -497,8 +497,8 @@ namespace rory {
 
 ```
 ## Работа программы:
-![Пример 1](screenshots/screenshot1.png)
-![Пример 2](screenshots/screenshot2.png)
+![Пример 1](screenshots/screenshot1.jpg)
+![Пример 2](screenshots/screenshot2.jpg)
 
 ## Вывод:
 
